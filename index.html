@@ -180,6 +180,45 @@
       box-shadow: 0 0 0 3px rgba(184,146,58,0.12);
     }
 
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,252,245,0.6);
+      border: 1px solid rgba(184,146,58,0.3);
+      border-radius: 3px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.6;
+    }
+
+    textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,146,58,0.12);
+    }
+
+    textarea::placeholder {
+      color: var(--sage);
+      opacity: 0.45;
+      font-style: italic;
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--sage);
+      opacity: 0.55;
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .char-count.warn { color: #b85c20; opacity: 1; }
+
     /* Custom select arrow */
     .select-wrap {
       position: relative;
@@ -510,6 +549,72 @@
       line-height: 1.5;
     }
 
+    /* ── Church image banner ── */
+    .church-banner {
+      width: 100%;
+      margin-bottom: 40px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 24px var(--shadow);
+      animation: fadeDown 0.7s ease both;
+      background: rgba(74,92,78,0.08);  /* placeholder bg while image loads */
+    }
+
+    .church-banner img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      object-position: center 40%;
+      display: block;
+      transition: opacity 0.4s;
+    }
+
+    /* Subtle gradient overlay so the title below doesn't clash */
+    .church-banner::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, rgba(249,245,238,0.7));
+      pointer-events: none;
+    }
+
+    /* If image fails to load, show a styled placeholder */
+    .church-banner img.error-state {
+      opacity: 0;
+      height: 0;
+    }
+
+    .church-banner-placeholder {
+      display: none;
+      height: 140px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--sage);
+      opacity: 0.4;
+    }
+
+    .church-banner img.error-state ~ .church-banner-placeholder {
+      display: flex;
+    }
+
+    .church-banner-placeholder span {
+      font-size: 36px;
+    }
+
+    .church-banner-placeholder p {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 600px) {
+      .church-banner img { height: 180px; }
+    }
+
     /* ── Footer ── */
     .footer {
       text-align: center;
@@ -546,6 +651,21 @@
 </head>
 <body>
   <div class="page">
+
+    <!-- Church photo banner -->
+    <!-- Place your church photo in the repo root named: church.jpg  -->
+    <!-- Supported formats: church.jpg · church.jpeg · church.png · church.webp -->
+    <div class="church-banner">
+      <img
+        src="St Paul.jpg"
+        alt="St Paul's Methodist Church"
+        onerror="this.classList.add('error-state')"
+      />
+      <div class="church-banner-placeholder">
+        <span>⛪</span>
+        <p>St Paul's Methodist Church</p>
+      </div>
+    </div>
 
     <!-- Header -->
     <header class="header">
@@ -688,6 +808,23 @@
           <p class="help-text">Modern: "Our Father in heaven…" &nbsp;·&nbsp; Traditional: "Our Father, which art in heaven…"</p>
         </div>
 
+        <div class="divider"></div>
+
+        <!-- Section: Additional notes -->
+        <p class="section-label">Additional Notes</p>
+
+        <div class="field">
+          <label for="comments">Instructions for Claude <span style="font-size:0.7rem;opacity:0.6;text-transform:none;letter-spacing:0;font-weight:300">(optional)</span></label>
+          <textarea
+            id="comments"
+            name="comments"
+            maxlength="1000"
+            placeholder="e.g. Skip the Lord's Prayer slide this week · Use Remembrance Sunday styling · The second reading is split between two readers · Hymn 342 should only use verses 1, 2 and 4"
+          ></textarea>
+          <p class="char-count" id="charCount">0 / 1000</p>
+          <p class="help-text">Anything here is passed directly to Claude as extra context. Use it to override defaults, flag unusual elements, or give guidance not visible in the order of service.</p>
+        </div>
+
         <!-- Error message -->
         <div class="error-msg" id="errorMsg"></div>
 
@@ -725,6 +862,16 @@
     const successEmail = document.getElementById('successEmail');
 
     let selectedFile = null;
+
+    // ── Character counter ──
+    const commentsField = document.getElementById('comments');
+    const charCount     = document.getElementById('charCount');
+
+    commentsField.addEventListener('input', () => {
+      const len = commentsField.value.length;
+      charCount.textContent = `${len} / 1000`;
+      charCount.classList.toggle('warn', len > 850);
+    });
 
     // ── Drag & drop ──
     dropZone.addEventListener('dragover', e => {
@@ -775,6 +922,8 @@
       const translation = document.getElementById('translation').value;
       const lordsPrayer = document.querySelector('input[name="lordsPrayer"]:checked').value;
 
+      const comments    = document.getElementById('comments').value.trim();
+
       // Validation
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showError('Please enter a valid email address.');
@@ -790,6 +939,7 @@
       data.append('email', email);
       data.append('translation', translation);
       data.append('lordsPrayer', lordsPrayer);
+      data.append('comments', comments);
       data.append('orderOfService', selectedFile, selectedFile.name);
 
       // Loading state
