@@ -719,7 +719,7 @@
               type="file"
               id="fileInput"
               name="orderOfService"
-              accept=".docx,.pdf,.txt,.pages"
+              accept=".docx,.doc,.pdf,.txt,.pages"
               required
             />
             <span class="drop-icon">📄</span>
@@ -891,7 +891,7 @@
     });
 
     function setFile(f) {
-      const allowed = ['.docx','.pdf','.txt','.pages'];
+      const allowed = ['.docx','.doc','.pdf','.txt','.pages'];
       const ext = '.' + f.name.split('.').pop().toLowerCase();
       if (!allowed.includes(ext)) {
         showError('Please upload a Word document (.docx), PDF, plain text (.txt), or Pages file (.pages).');
