@@ -657,7 +657,7 @@
     <!-- Supported formats: church.jpg · church.jpeg · church.png · church.webp -->
     <div class="church-banner">
       <img
-        src="St Paul.jpg"
+        src="church.jpg"
         alt="St Paul's Methodist Church"
         onerror="this.classList.add('error-state')"
       />
@@ -719,13 +719,13 @@
               type="file"
               id="fileInput"
               name="orderOfService"
-              accept=".docx,.pdf,.txt,.pages"
+              accept=".docx,.doc,.txt,.pages"
               required
             />
             <span class="drop-icon">📄</span>
             <p class="drop-main">Drop your file here, or click to browse</p>
             <p class="drop-sub">Drag &amp; drop or click to select</p>
-            <p class="drop-accepted">Word · PDF · Plain text · Pages</p>
+            <p class="drop-accepted">Word (.docx / .doc) · Plain text · Pages</p>
           </div>
           <div class="file-chosen" id="fileChosen">
             <span class="file-chosen-icon">📎</span>
@@ -805,7 +805,7 @@
               <label for="lpTraditional">Traditional</label>
             </div>
           </div>
-          <p class="help-text">Modern: "Our Father in heaven…" &nbsp;·&nbsp; Traditional: "Our Father, which art in heaven…"</p>
+          <p class="help-text">Modern: "Our Father in heaven…" &nbsp;·&nbsp; Traditional: "Our Father, who art in heaven…"</p>
         </div>
 
         <div class="divider"></div>
@@ -814,15 +814,15 @@
         <p class="section-label">Additional Notes</p>
 
         <div class="field">
-          <label for="comments">Instructions for Claude <span style="font-size:0.7rem;opacity:0.6;text-transform:none;letter-spacing:0;font-weight:300">(optional)</span></label>
+          <label for="comments">Instructions for our AI Agent <span style="font-size:0.7rem;opacity:0.6;text-transform:none;letter-spacing:0;font-weight:300">(optional)</span></label>
           <textarea
             id="comments"
             name="comments"
             maxlength="1000"
-            placeholder="e.g. Skip the Lord's Prayer slide this week · Use Remembrance Sunday styling · The second reading is split between two readers · Hymn 342 should only use verses 1, 2 and 4"
+            placeholder="e.g. Skip the Lord's Prayer slide this week · Use Placeholders for things you can't find · The second reading is split between two readers · Hymn 342 should only use verses 1, 2 and 4"
           ></textarea>
           <p class="char-count" id="charCount">0 / 1000</p>
-          <p class="help-text">Anything here is passed directly to Claude as extra context. Use it to override defaults, flag unusual elements, or give guidance not visible in the order of service.</p>
+          <p class="help-text">Anything here is passed directly to the AI Agent as extra context. Use it to override defaults, flag unusual elements, or give guidance not visible in the order of service.</p>
         </div>
 
         <!-- Error message -->
@@ -840,7 +840,7 @@
     </div>
 
     <footer class="footer">
-      <p>St Paul's Methodist Church &nbsp;·&nbsp; Powered by Claude AI</p>
+      <p>St Paul's Methodist Church &nbsp;·&nbsp; Powered by AI</p>
     </footer>
 
   </div>
@@ -891,10 +891,10 @@
     });
 
     function setFile(f) {
-      const allowed = ['.docx','.pdf','.txt','.pages'];
+      const allowed = ['.docx','.doc','.txt','.pages'];
       const ext = '.' + f.name.split('.').pop().toLowerCase();
       if (!allowed.includes(ext)) {
-        showError('Please upload a Word document (.docx), PDF, plain text (.txt), or Pages file (.pages).');
+        showError('Please upload a Word document (.docx or .doc), plain text (.txt), or Pages file (.pages).');
         return;
       }
       if (f.size > 10 * 1024 * 1024) {
